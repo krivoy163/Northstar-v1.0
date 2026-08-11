@@ -1,6 +1,7 @@
 # Project Northstar v1.0
 
 Personal multi-protocol VPN infrastructure based on Ubuntu, Nginx, 3X-UI and Xray.
+Две инструкции по настройке лежат в корне проекта
 
 ## Production stack
 
