@@ -105,11 +105,41 @@ export XUI_SSL_MODE=none
 bash "$XUI_INSTALLER"
 
 say "Verify 3X-UI"
+
 systemctl daemon-reload
-systemctl list-unit-files --type=service | grep -q '^x-ui.service' || die "x-ui.service was not created."
-systemctl enable --now x-ui
-systemctl is-active --quiet x-ui || die "x-ui.service is not running."
-[[ -s /etc/x-ui/install-result.env ]] || die "install-result.env was not created."
+
+echo "Waiting for x-ui systemd service..."
+
+XUI_SERVICE_READY=0
+
+for _ in $(seq 1 30); do
+  systemctl daemon-reload
+
+  if systemctl cat x-ui.service >/dev/null 2>&1; then
+    XUI_SERVICE_READY=1
+    break
+  fi
+
+  sleep 2
+done
+
+[[ "$XUI_SERVICE_READY" -eq 1 ]] \
+  || die "x-ui.service was not created within 60 seconds."
+
+systemctl enable x-ui >/dev/null
+systemctl restart x-ui
+
+for _ in $(seq 1 30); do
+  if systemctl is-active --quiet x-ui; then
+    break
+  fi
+  sleep 2
+done
+
+systemctl is-active --quiet x-ui \
+  || die "x-ui.service did not become active."
+
+ok "x-ui.service is active"
 
 source /etc/x-ui/install-result.env
 [[ -n "${XUI_PANEL_PORT:-}" ]] || die "XUI_PANEL_PORT missing."
