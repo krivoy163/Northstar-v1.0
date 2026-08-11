@@ -10,7 +10,7 @@ ok(){ echo "[OK] $*"; }
 trap 'rc=$?; if [[ $rc -ne 0 ]]; then echo; echo "Northstar deployment stopped with exit code $rc."; fi' EXIT
 
 echo "========================================"
-echo " Project Northstar v1.1.1 — NEW VPS"
+echo " Project Northstar v1.1.2 - NEW VPS"
 echo "========================================"
 echo
 echo "This creates a NEW independent server."
@@ -66,23 +66,15 @@ echo
 read -rp "Deploy? [y/N]: " CONFIRM
 [[ "$CONFIRM" =~ ^[Yy]$ ]] || exit 0
 
-say "Wait for Ubuntu background updates"
-for _ in $(seq 1 120); do
-  if pgrep -f 'unattended-upgrade|apt.systemd.daily' >/dev/null 2>&1; then
-    echo "Ubuntu background package maintenance is still running..."
-    sleep 5
-  else
-    break
-  fi
-done
-pgrep -f 'unattended-upgrade|apt.systemd.daily' >/dev/null 2>&1 && die "Package maintenance did not finish within 10 minutes."
-
 say "Base packages"
+echo "APT may wait while Ubuntu finishes background package maintenance."
 export DEBIAN_FRONTEND=noninteractive
-apt-get -o DPkg::Lock::Timeout=600 update
-apt-get -o DPkg::Lock::Timeout=600 install -y \
+
+apt-get -o DPkg::Lock::Timeout=1800 update
+apt-get -o DPkg::Lock::Timeout=1800 install -y \
   ca-certificates curl git jq nano nginx certbot python3-certbot-nginx \
   socat unzip tar openssl
+
 ok "Base packages installed"
 
 say "DNS check"
