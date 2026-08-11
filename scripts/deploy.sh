@@ -10,7 +10,7 @@ ok(){ echo "[OK] $*"; }
 trap 'rc=$?; if [[ $rc -ne 0 ]]; then echo; echo "Northstar deployment stopped with exit code $rc."; fi' EXIT
 
 echo "========================================"
-echo " Project Northstar v1.1.2 - NEW VPS"
+echo " Project Northstar v1.1.3 - NEW VPS"
 echo "========================================"
 echo
 echo "This creates a NEW independent server."
